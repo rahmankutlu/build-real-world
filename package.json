@@ -1,6 +1,6 @@
 {
   "name": "build-real-world",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "description": "Production-grade system design case studies, architecture patterns, failure modes, database models, APIs, and scaling strategies.",
   "license": "MIT",

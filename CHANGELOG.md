@@ -4,6 +4,27 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/en/1.1.
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-09-27
+
+### Added
+
+- Per-project 1200×630 Open Graph images and a new site preview, generated from content by `npm run og`; `npm run validate` fails when an image is stale.
+- PNG app icons (180, 192, 512) for Apple devices and the web manifest.
+- Accessible breadcrumbs starting at Home on project, pattern, and edge-case pages, with matching `BreadcrumbList` structured data.
+- Export validation for unique titles and canonicals, meta descriptions, `noindex` misuse, JSON-LD, and every `og:image`, sitemap, and feed URL resolving to an exported file.
+
+### Changed
+
+- Scale evolution tables are domain-specific in all ten case studies; tests reject sentences repeated across three or more projects.
+- Architecture diagrams use a top-to-bottom layout. Diagrams render at natural size and never below 70% of it, so labels stay legible; wide diagrams scroll inside their frame.
+- Diagrams render when scrolling pauses near them, so pages load the Mermaid runtime lazily and table-of-contents jumps land on their target.
+- CI builds and browser-tests both the root and GitHub Pages targets; Pages deploys only after CI succeeds on `main`, publishing the artifact CI built.
+- Structured data for patterns and edge cases now includes publisher, license, and image.
+
+### Fixed
+
+- The system profile no longer wraps the "Primary DB" label.
+
 ## [0.1.2] - 2026-09-27
 
 ### Fixed
