@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import type { Project } from "./types";
 import { absoluteUrl, site } from "./site";
+import { ogSize, projectOgPath } from "./og-assets";
 
-const preview = { url: absoluteUrl("/social-preview.png"), width: 1200, height: 630, alt: "Build Real World — production-grade system design" };
+type SocialImage = { url: string; width: number; height: number; alt: string };
 
-export function pageMetadata({ title, description, path, index = true, type = "website" }: { title: string; description: string; path: string; index?: boolean; type?: "website" | "article" }): Metadata {
+export const sitePreview: SocialImage = { url: absoluteUrl("/social-preview.png"), ...ogSize, alt: "Build Real World: system design, one real product at a time" };
+
+export function pageMetadata({ title, description, path, index = true, type = "website", image = sitePreview }: { title: string; description: string; path: string; index?: boolean; type?: "website" | "article"; image?: SocialImage }): Metadata {
   const url = absoluteUrl(path);
   const socialTitle = `${title} | ${site.name}`;
   return {
@@ -12,8 +15,8 @@ export function pageMetadata({ title, description, path, index = true, type = "w
     description,
     alternates: { canonical: url },
     robots: index ? { index: true, follow: true } : { index: false, follow: true },
-    openGraph: { type, siteName: site.name, title: socialTitle, description, url, images: [preview] },
-    twitter: { card: "summary_large_image", title: socialTitle, description, images: [preview.url] },
+    openGraph: { type, siteName: site.name, title: socialTitle, description, url, images: [image] },
+    twitter: { card: "summary_large_image", title: socialTitle, description, images: [{ url: image.url, alt: image.alt }] },
   };
 }
 
@@ -36,9 +39,41 @@ export function projectMetadata(project: Project): Metadata {
     description: `${project.summary} Explore its requirements, PostgreSQL model, APIs, concurrency controls, failure recovery, security, and scale evolution.`,
     path: `/projects/${project.slug}/`,
     type: "article",
+    image: { url: absoluteUrl(projectOgPath(project.slug)), ...ogSize, alt: `${project.title} system design case study` },
   });
 }
 
 export function jsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, "\\u003c");
+}
+
+export type Crumb = { name: string; path: string };
+
+export function breadcrumbJsonLd(crumbs: Crumb[]) {
+  return {
+    "@type": "BreadcrumbList",
+    itemListElement: crumbs.map((crumb, index) => ({ "@type": "ListItem", position: index + 1, name: crumb.name, item: absoluteUrl(crumb.path) })),
+  };
+}
+
+/** Shared TechArticle/LearningResource node for case studies, patterns, and edge cases. */
+export function articleJsonLd({ headline, description, path, resourceType, about, educationalLevel, image = sitePreview.url }: { headline: string; description: string; path: string; resourceType: string; about: string[]; educationalLevel?: string; image?: string }) {
+  const url = absoluteUrl(path);
+  return {
+    "@type": ["TechArticle", "LearningResource"],
+    headline,
+    description,
+    url,
+    mainEntityOfPage: url,
+    image,
+    inLanguage: "en",
+    author: { "@type": "Person", name: site.author, url: site.github },
+    publisher: { "@type": "Organization", name: site.name, url: absoluteUrl("/"), logo: absoluteUrl("/icon-512.png") },
+    isAccessibleForFree: true,
+    license: "https://creativecommons.org/licenses/by/4.0/",
+    learningResourceType: resourceType,
+    ...(educationalLevel ? { educationalLevel } : {}),
+    about,
+    dateModified: site.releaseDate,
+  };
 }

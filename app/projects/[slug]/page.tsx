@@ -8,8 +8,10 @@ import { projectRelationships } from "@/content/relationships";
 import { MermaidDiagram } from "@/components/mermaid-diagram";
 import { CopyBlock } from "@/components/copy-block";
 import { DocToc } from "@/components/doc-toc";
-import { absoluteUrl, site } from "@/lib/site";
-import { jsonLd, projectMetadata } from "@/lib/seo";
+import { absoluteUrl } from "@/lib/site";
+import { articleJsonLd, breadcrumbJsonLd, jsonLd, projectMetadata } from "@/lib/seo";
+import { projectOgPath } from "@/lib/og-assets";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 
 const sections = ["overview", "requirements", "workflows", "domain-model", "database", "apis", "architecture", "events", "failures", "consistency", "caching-jobs", "security", "observability", "testing", "deployment", "scaling", "related"];
 const labels: Record<string, string> = { overview: "Overview", requirements: "Requirements", workflows: "Workflows", "domain-model": "Domain model", database: "Database", apis: "APIs", architecture: "Architecture", events: "Events", failures: "Failure modes", consistency: "Consistency & concurrency", "caching-jobs": "Caching & jobs", security: "Security", observability: "Observability", testing: "Testing", deployment: "Deployment", scaling: "Scale evolution", related: "Continue exploring" };
@@ -29,16 +31,17 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   if (!project) notFound();
   const apiText = project.endpoints.map((e) => `${e.method.padEnd(6)} ${e.path}`).join("\n");
   const relation = projectRelationships[project.slug];
-  const pageUrl = absoluteUrl(`/projects/${project.slug}/`);
+  const path = `/projects/${project.slug}/`;
+  const crumbs = [{ name: "Home", path: "/" }, { name: "Projects", path: "/#projects" }, { name: project.title, path }];
   const structuredData = { "@context": "https://schema.org", "@graph": [
-    { "@type": ["TechArticle", "LearningResource"], headline: `${project.title} system design`, description: project.summary, author: { "@type": "Person", name: site.author, url: site.github }, publisher: { "@type": "Organization", name: site.name, url: absoluteUrl("/") }, mainEntityOfPage: pageUrl, url: pageUrl, educationalLevel: project.difficulty, learningResourceType: "Case study", about: project.topics, dateModified: site.releaseDate },
-    { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Projects", item: absoluteUrl("/#projects") }, { "@type": "ListItem", position: 2, name: project.title, item: pageUrl }] },
+    articleJsonLd({ headline: `${project.title} system design`, description: project.summary, path, resourceType: "Case study", about: project.topics, educationalLevel: project.difficulty, image: absoluteUrl(projectOgPath(project.slug)) }),
+    breadcrumbJsonLd(crumbs),
   ] };
   return <div className="shell doc-layout">
     <DocToc sections={sections} labels={labels} />
     <article className="doc">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
-      <header className="doc-header"><div className="breadcrumb"><Link href="/">Projects</Link><span>/</span><span>{project.title}</span></div><div className="meta-row"><span className="tag accent">{project.difficulty}</span>{project.topics.map((topic) => <span className="tag" key={topic}>{topic}</span>)}</div><h1>{project.title}</h1><p className="doc-lead">{project.summary}</p></header>
+      <header className="doc-header"><Breadcrumbs crumbs={crumbs} /><div className="meta-row"><span className="tag accent">{project.difficulty}</span>{project.topics.map((topic) => <span className="tag" key={topic}>{topic}</span>)}</div><h1>{project.title}</h1><p className="doc-lead">{project.summary}</p></header>
       <section className="doc-section" id="overview"><h2>Product overview</h2><p>{project.purpose}</p><h3>Main actors</h3><p>{project.actors.join(", ")}.</p><h3>Assumptions</h3><StringList items={project.assumptions} /><h3>Non-goals</h3><StringList items={project.nonGoals} /></section>
       <section className="doc-section" id="requirements"><h2>Requirements</h2><h3>Must-have</h3><StringList items={project.requirements.must} /><h3>Should-have</h3><StringList items={project.requirements.should} /><h3>Future scope</h3><StringList items={project.requirements.future} /><h3>Non-functional decisions</h3><div className="table-wrap"><table><thead><tr><th>Concern</th><th>Decision</th></tr></thead><tbody>{project.nfrs.map((item) => <tr key={item.concern}><td>{item.concern}</td><td>{item.decision}</td></tr>)}</tbody></table></div><h3>User roles</h3><div className="table-wrap"><table><thead><tr><th>Role</th><th>Access boundary</th></tr></thead><tbody>{project.roles.map((item) => <tr key={item.role}><td>{item.role}</td><td>{item.access}</td></tr>)}</tbody></table></div></section>
       <section className="doc-section" id="workflows"><h2>Core workflows</h2>{project.journeys.map((journey) => <div className="workflow" key={journey.name}><strong>{journey.name}</strong><div className="workflow-steps">{journey.steps.join(" → ")}</div></div>)}</section>

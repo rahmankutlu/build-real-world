@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { absoluteUrl, site, withBasePath } from "@/lib/site";
+import { sitePreview } from "@/lib/seo";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,9 +17,12 @@ export const metadata: Metadata = {
   keywords: ["system design", "software architecture", "distributed systems", "database design", "API design", "backend engineering"],
   alternates: { canonical: absoluteUrl("/") },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
-  openGraph: { type: "website", siteName: site.name, title: `${site.name} — Production-grade System Design`, description: site.description, url: absoluteUrl("/"), images: [{ url: absoluteUrl("/social-preview.png"), width: 1200, height: 630, alt: "Build Real World — production-grade system design" }] },
-  twitter: { card: "summary_large_image", title: `${site.name} — Production-grade System Design`, description: site.description, images: [absoluteUrl("/social-preview.png")] },
-  icons: { icon: [{ url: withBasePath("/icon.svg"), type: "image/svg+xml" }] },
+  openGraph: { type: "website", siteName: site.name, title: `${site.name} — Production-grade System Design`, description: site.description, url: absoluteUrl("/"), images: [sitePreview] },
+  twitter: { card: "summary_large_image", title: `${site.name} — Production-grade System Design`, description: site.description, images: [{ url: sitePreview.url, alt: sitePreview.alt }] },
+  icons: {
+    icon: [{ url: withBasePath("/icon.svg"), type: "image/svg+xml" }, { url: withBasePath("/icon-192.png"), type: "image/png", sizes: "192x192" }],
+    apple: [{ url: withBasePath("/apple-touch-icon.png"), sizes: "180x180" }],
+  },
   manifest: withBasePath("/manifest.webmanifest"),
 };
 

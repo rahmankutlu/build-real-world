@@ -125,7 +125,12 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .toc a:hover { color: var(--accent); border-color: var(--accent); }
 .toc a.active { color: var(--accent); border-left-color: var(--accent); background: linear-gradient(90deg, var(--accent-soft), transparent); }
 .doc { min-width: 0; }
-.breadcrumb { display: flex; gap: 7px; color: var(--muted); font-size: 13px; }
+.breadcrumb { color: var(--muted); font-size: 13px; }
+.breadcrumb ol { display: flex; flex-wrap: wrap; gap: 7px; margin: 0; padding: 0; list-style: none; }
+.breadcrumb li { display: flex; gap: 7px; }
+.breadcrumb li + li::before { content: "/"; color: var(--line); }
+.breadcrumb a { color: var(--muted); }
+.breadcrumb a:hover { color: var(--accent); }
 .doc-header { padding-bottom: 32px; border-bottom: 1px solid var(--line); }
 .doc-header h1 { margin: 12px 0 11px; font-size: clamp(35px, 6vw, 52px); line-height: 1.04; letter-spacing: -.05em; }
 .doc-lead { margin: 0; color: var(--muted); font-size: 18px; }
