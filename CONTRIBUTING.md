@@ -32,7 +32,11 @@ Use `content/projects/_template/content.ts.example` as the review checklist. Met
 
 Start from [`content/projects/_template`](content/projects/_template/). A proposal must identify the actors, core invariant, source of truth, transaction boundary, retry behavior, concurrency risk, cache boundary, asynchronous work, security boundary, operational signals, and the workload pressure that justifies each scale transition.
 
-Register the finished project and its curated relationships, then run `npm run validate`. The validator rejects missing metadata, shallow failure/security coverage, broken references, duplicate slugs, generic observability, and incomplete diagrams.
+Register the finished project and its curated relationships, then run `npm run og` and `npm run validate`. The validators reject missing metadata, shallow failure/security coverage, broken references, duplicate slugs, generic observability, sentences copied across case studies, invalid Mermaid diagrams, and missing or stale social-preview images.
+
+### Social-preview images
+
+`public/social-preview.png`, `public/og/projects/*.png`, and the PNG icons are generated from content by `npm run og` and committed, so builds never need network access. Regenerate them whenever you change a project's title, summary, difficulty, topics, or system traits; `npm run validate` fails when an image is stale. The generator downloads the Inter font from Google Fonts on first use.
 
 ## Licensing contributions
 

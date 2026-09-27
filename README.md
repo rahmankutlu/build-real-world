@@ -14,7 +14,7 @@ Learn how applications are shaped by transactions, concurrency, failures, queues
 
 [**Open the live site**](https://rahmankutlu.github.io/build-real-world/) · [**Explore the projects**](https://rahmankutlu.github.io/build-real-world/#projects) · [**Contribute**](CONTRIBUTING.md)
 
-![Build Real World — production-grade system design](public/social-preview.png)
+[![Build Real World: system design, one real product at a time](public/social-preview.png)](https://rahmankutlu.github.io/build-real-world/)
 
 ## Why this is different
 
@@ -58,7 +58,9 @@ Every flagship project includes actors and requirements, domain relationships, a
 
 ## See the platform
 
-![Project explorer in the Build Real World web app](docs/site-preview.png)
+| Home and project explorer | A case study: architecture section |
+| --- | --- |
+| [![Build Real World homepage](docs/site-preview.png)](https://rahmankutlu.github.io/build-real-world/) | [![E-commerce case study showing the system context and application architecture diagrams](docs/project-preview.png)](https://rahmankutlu.github.io/build-real-world/projects/ecommerce/#architecture) |
 
 The web app is static-first: content and routes are generated at build time; search, filters, comparison, theme switching, and Mermaid rendering run in the browser. No account, backend, analytics, or tracker is required.
 
@@ -109,7 +111,10 @@ content metadata + typed case studies
   content pages  search   sitemap/feed
                 │
                 ▼
-        GitHub Pages artifact
+   CI: unit, validation, E2E (root + Pages path)
+                │  passes on main
+                ▼
+  GitHub Pages deploys the artifact CI built
 ```
 
 ```text
@@ -120,7 +125,7 @@ content/patterns/    engineering pattern library
 content/edge-cases/  failure field guide
 content/relationships.ts
 lib/                 schemas, URLs, SEO, shared types
-scripts/             content, link, SEO, and export validation
+scripts/             content, Mermaid, link, SEO, Open Graph, and export validation
 tests/               unit and component tests
 e2e/                 Playwright browser flows
 ```

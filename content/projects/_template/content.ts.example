@@ -5,5 +5,13 @@
 // consistency/concurrency, caching/jobs, 5+ security controls, observability,
 // unit/integration/contract/E2E/concurrency/failure tests, deployment,
 // 1K/100K/1M+ workload scenarios, and three readable Mermaid diagrams.
+//
+// Scale: call `scale({ start, middle, large })` from `./helpers`; each stage is
+// [architecture, decision rule] written for this domain. Content tests reject
+// sentences shared by three or more projects.
+// Diagrams: `diagrams(context, architecture, sequence)` takes flowchart edges and
+// sequence messages. Do not put ";" inside a sequence message; Mermaid treats it
+// as a statement separator.
 // Import `Project` from `@/lib/types` and register the completed content in
-// `content/projects/index.ts`. Run `npm run validate` before opening a PR.
+// `content/projects/index.ts`, then run `npm run og` to generate its Open Graph
+// image and `npm run validate` before opening a PR.
