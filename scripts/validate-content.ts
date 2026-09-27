@@ -5,10 +5,11 @@ import { projects } from "../content/projects";
 import { patterns } from "../content/patterns";
 import { edgeCases } from "../content/edge-cases";
 import { learningPaths } from "../content/learning-paths";
+import { projectRelationships } from "../content/relationships";
 
 const root = process.cwd();
 const projectDir = path.join(root, "content/projects");
-const metadataFiles = fs.readdirSync(projectDir, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => path.join(projectDir, entry.name, "metadata.json")).filter(fs.existsSync);
+const metadataFiles = fs.readdirSync(projectDir, { withFileTypes: true }).filter((entry) => entry.isDirectory() && !entry.name.startsWith("_")).map((entry) => path.join(projectDir, entry.name, "metadata.json")).filter(fs.existsSync);
 const parsed = metadataFiles.map((file) => projectMetadataSchema.parse(JSON.parse(fs.readFileSync(file, "utf8"))));
 const duplicate = <T>(values: T[]) => values.find((value, index) => values.indexOf(value) !== index);
 function assert(condition: unknown, message: string): asserts condition { if (!condition) throw new Error(message); }
@@ -34,7 +35,17 @@ for (const project of projects) {
   assert(project.testing.some((item) => item.layer.toLowerCase().includes("concurrency")), `${project.slug}: missing concurrency test strategy`);
 }
 const projectSlugs = new Set(projects.map((item) => item.slug));
+const patternSlugs = new Set(patterns.map((item) => item.slug));
+const edgeCaseSlugs = new Set(edgeCases.map((item) => item.slug));
 for (const pathItem of learningPaths) for (const ref of pathItem.projects) assert(projectSlugs.has(ref), `Learning path ${pathItem.slug} references missing project ${ref}`);
 for (const item of edgeCases) for (const ref of item.projects) assert(projectSlugs.has(ref), `Edge case ${item.slug} references missing project ${ref}`);
+for (const project of projects) {
+  const relation = projectRelationships[project.slug];
+  assert(relation, `${project.slug}: missing curated relationships`);
+  for (const ref of relation.patterns) assert(patternSlugs.has(ref), `${project.slug}: missing related pattern ${ref}`);
+  for (const ref of relation.edgeCases) assert(edgeCaseSlugs.has(ref), `${project.slug}: missing related edge case ${ref}`);
+  for (const ref of relation.relatedProjects) assert(projectSlugs.has(ref) && ref !== project.slug, `${project.slug}: invalid related project ${ref}`);
+}
+assert(new Set(projects.map((project) => JSON.stringify(project.observability))).size === projects.length, "Project observability sections must be domain-specific");
 
 console.log(`Content valid: ${projects.length} projects, ${patterns.length} patterns, ${edgeCases.length} edge cases, ${learningPaths.length} paths.`);

@@ -4,8 +4,9 @@ import { projects } from "@/content/projects";
 import { patterns } from "@/content/patterns";
 import { edgeCases } from "@/content/edge-cases";
 import { SearchClient, type SearchItem } from "@/components/search-client";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Search", description: "Search projects, engineering patterns, edge cases, and architecture concepts." };
+export const metadata: Metadata = pageMetadata({ title: "Search the engineering library", description: "Search system design projects, engineering patterns, edge cases, and architecture concepts.", path: "/search/", index: false });
 const index: SearchItem[] = [
   ...projects.map((p) => ({ type: "Project", title: p.title, summary: p.summary, href: `/projects/${p.slug}/`, text: JSON.stringify(p) })),
   ...patterns.map((p) => ({ type: "Pattern", title: p.title, summary: p.summary, href: `/patterns/${p.slug}/`, text: JSON.stringify(p) })),

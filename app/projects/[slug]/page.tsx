@@ -2,21 +2,24 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { projects, projectBySlug } from "@/content/projects";
+import { patternBySlug } from "@/content/patterns";
+import { edgeCaseBySlug } from "@/content/edge-cases";
+import { projectRelationships } from "@/content/relationships";
 import { MermaidDiagram } from "@/components/mermaid-diagram";
 import { CopyBlock } from "@/components/copy-block";
-import { site } from "@/lib/site";
+import { DocToc } from "@/components/doc-toc";
+import { absoluteUrl, site } from "@/lib/site";
+import { jsonLd, projectMetadata } from "@/lib/seo";
 
-const sections = ["overview", "requirements", "workflows", "domain-model", "database", "apis", "architecture", "events", "failures", "consistency", "caching-jobs", "security", "observability", "testing", "deployment", "scaling"];
-const labels: Record<string, string> = { overview: "Overview", requirements: "Requirements", workflows: "Workflows", "domain-model": "Domain model", database: "Database", apis: "APIs", architecture: "Architecture", events: "Events", failures: "Failure modes", consistency: "Consistency & concurrency", "caching-jobs": "Caching & jobs", security: "Security", observability: "Observability", testing: "Testing", deployment: "Deployment", scaling: "Scale evolution" };
+const sections = ["overview", "requirements", "workflows", "domain-model", "database", "apis", "architecture", "events", "failures", "consistency", "caching-jobs", "security", "observability", "testing", "deployment", "scaling", "related"];
+const labels: Record<string, string> = { overview: "Overview", requirements: "Requirements", workflows: "Workflows", "domain-model": "Domain model", database: "Database", apis: "APIs", architecture: "Architecture", events: "Events", failures: "Failure modes", consistency: "Consistency & concurrency", "caching-jobs": "Caching & jobs", security: "Security", observability: "Observability", testing: "Testing", deployment: "Deployment", scaling: "Scale evolution", related: "Continue exploring" };
 
 export function generateStaticParams() { return projects.map(({ slug }) => ({ slug })); }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const project = projectBySlug.get((await params).slug);
   if (!project) return {};
-  const title = `${project.title} system design`;
-  const url = `/projects/${project.slug}/`;
-  return { title, description: project.summary, alternates: { canonical: url }, openGraph: { title, description: project.summary, url, type: "article" } };
+  return projectMetadata(project);
 }
 
 function StringList({ items }: { items: string[] }) { return <ul>{items.map((item) => <li key={item}>{item}</li>)}</ul>; }
@@ -25,11 +28,16 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const project = projectBySlug.get((await params).slug);
   if (!project) notFound();
   const apiText = project.endpoints.map((e) => `${e.method.padEnd(6)} ${e.path}`).join("\n");
-  const jsonLd = { "@context": "https://schema.org", "@type": "TechArticle", headline: `${project.title} system design`, description: project.summary, author: { "@type": "Organization", name: site.name }, mainEntityOfPage: `${site.url}/projects/${project.slug}/`, educationalLevel: project.difficulty, about: project.topics };
+  const relation = projectRelationships[project.slug];
+  const pageUrl = absoluteUrl(`/projects/${project.slug}/`);
+  const structuredData = { "@context": "https://schema.org", "@graph": [
+    { "@type": ["TechArticle", "LearningResource"], headline: `${project.title} system design`, description: project.summary, author: { "@type": "Person", name: site.author, url: site.github }, publisher: { "@type": "Organization", name: site.name, url: absoluteUrl("/") }, mainEntityOfPage: pageUrl, url: pageUrl, educationalLevel: project.difficulty, learningResourceType: "Case study", about: project.topics, dateModified: site.releaseDate },
+    { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Projects", item: absoluteUrl("/#projects") }, { "@type": "ListItem", position: 2, name: project.title, item: pageUrl }] },
+  ] };
   return <div className="shell doc-layout">
-    <aside className="toc" aria-label="On this page"><div className="toc-label">On this page</div>{sections.map((id) => <a href={`#${id}`} key={id}>{labels[id]}</a>)}</aside>
+    <DocToc sections={sections} labels={labels} />
     <article className="doc">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }} />
       <header className="doc-header"><div className="breadcrumb"><Link href="/">Projects</Link><span>/</span><span>{project.title}</span></div><div className="meta-row"><span className="tag accent">{project.difficulty}</span>{project.topics.map((topic) => <span className="tag" key={topic}>{topic}</span>)}</div><h1>{project.title}</h1><p className="doc-lead">{project.summary}</p></header>
       <section className="doc-section" id="overview"><h2>Product overview</h2><p>{project.purpose}</p><h3>Main actors</h3><p>{project.actors.join(", ")}.</p><h3>Assumptions</h3><StringList items={project.assumptions} /><h3>Non-goals</h3><StringList items={project.nonGoals} /></section>
       <section className="doc-section" id="requirements"><h2>Requirements</h2><h3>Must-have</h3><StringList items={project.requirements.must} /><h3>Should-have</h3><StringList items={project.requirements.should} /><h3>Future scope</h3><StringList items={project.requirements.future} /><h3>Non-functional decisions</h3><div className="table-wrap"><table><thead><tr><th>Concern</th><th>Decision</th></tr></thead><tbody>{project.nfrs.map((item) => <tr key={item.concern}><td>{item.concern}</td><td>{item.decision}</td></tr>)}</tbody></table></div><h3>User roles</h3><div className="table-wrap"><table><thead><tr><th>Role</th><th>Access boundary</th></tr></thead><tbody>{project.roles.map((item) => <tr key={item.role}><td>{item.role}</td><td>{item.access}</td></tr>)}</tbody></table></div></section>
@@ -47,6 +55,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       <section className="doc-section" id="testing"><h2>Testing strategy</h2><div className="table-wrap"><table><thead><tr><th>Layer</th><th>What it proves</th></tr></thead><tbody>{project.testing.map((item) => <tr key={item.layer}><td>{item.layer}</td><td>{item.coverage}</td></tr>)}</tbody></table></div><p className="note">Do not mock PostgreSQL constraints, transaction isolation, object-store semantics, or provider contract fixtures in the tests intended to prove those boundaries.</p></section>
       <section className="doc-section" id="deployment"><h2>Deployment evolution</h2>{project.deployment.map((stage) => <div className="workflow" key={stage.stage}><strong>{stage.stage}</strong><div>{stage.stack}</div></div>)}</section>
       <section className="doc-section" id="scaling"><h2>Scale evolution</h2><p>These are architecture scenarios, not throughput claims. Each transition should follow measured workload and reliability pressure.</p><div className="table-wrap"><table><thead><tr><th>Scenario</th><th>Architecture may evolve toward</th><th>Decision rule</th></tr></thead><tbody>{project.scale.map((stage) => <tr key={stage.users}><td>{stage.users}</td><td>{stage.architecture}</td><td>{stage.pressure}</td></tr>)}</tbody></table></div></section>
+      <section className="doc-section" id="related"><h2>Continue exploring</h2><div className="related-grid"><div><h3>Patterns used here</h3><ul>{relation.patterns.map((slug) => <li key={slug}><Link className="text-link" href={`/patterns/${slug}/`}>{patternBySlug.get(slug)?.title} →</Link></li>)}</ul></div><div><h3>Failure field guide</h3><ul>{relation.edgeCases.map((slug) => <li key={slug}><Link className="text-link" href={`/edge-cases/${slug}/`}>{edgeCaseBySlug.get(slug)?.title} →</Link></li>)}</ul></div><div><h3>Compare systems</h3><ul>{relation.relatedProjects.map((slug) => <li key={slug}><Link className="text-link" href={`/projects/${slug}/`}>{projectBySlug.get(slug)?.title} →</Link></li>)}</ul></div></div></section>
     </article>
     <aside className="rail"><div className="toc-label">System profile</div><div className="rail-row"><span>Primary DB</span><b>{project.primaryDb}</b></div><div className="rail-row"><span>Realtime</span><b>{project.realtime ? "Yes" : "No"}</b></div><div className="rail-row"><span>Queue</span><b>{project.queue ? "Yes" : "No"}</b></div><div className="rail-row"><span>Payments</span><b>{project.payments ? "Yes" : "No"}</b></div><div className="rail-row"><span>Multi-tenant</span><b>{project.multiTenancy ? "Yes" : "No"}</b></div></aside>
   </div>;
