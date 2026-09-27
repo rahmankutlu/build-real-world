@@ -26,6 +26,7 @@ export function ProjectExplorer({ projects }: { projects: ProjectMeta[] }) {
     {filtered.length ? <div className="project-grid">{filtered.map((project, index) => <Link className="project-card" href={`/projects/${project.slug}/`} key={project.slug}>
       <div className="card-kicker"><span>{String(index + 1).padStart(2, "0")} / Case study</span><span>{project.difficulty}</span></div>
       <h3>{project.title}</h3><p>{project.summary}</p>
+      <dl className="card-facts"><div><dt>Database</dt><dd>{project.primaryDb}</dd></div><div><dt>System traits</dt><dd>{[project.realtime && "Realtime", project.queue && "Queue", project.payments && "Payments", project.multiTenancy && "Multi-tenant"].filter(Boolean).join(" · ") || "Transactional"}</dd></div></dl>
       <div className="meta-row">{project.topics.slice(0, 4).map((topic) => <span className="tag" key={topic}>{topic}</span>)}</div>
     </Link>)}</div> : <div className="empty">No case studies match these filters.</div>}
   </>;
