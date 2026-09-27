@@ -1,6 +1,6 @@
 import type { Project } from "@/lib/types";
 import meta from "./metadata.json";
-import { baseObservability, diagrams, scale } from "../helpers";
+import { diagrams, scale } from "../helpers";
 
 const project: Project = {
   ...meta,
@@ -68,7 +68,7 @@ const project: Project = {
   caching: { cache: ["Restaurant discovery results by coarse geocell", "Published versioned menus", "Static restaurant media"], never: ["Current courier assignment", "Whether restaurant can accept this order", "Settlement balance"], policy: "Short TTL discovery cache; menu keys include version. Invalidation accelerates closure changes, while order placement revalidates every assumption." },
   jobs: ["Restaurant acceptance deadline", "Offer expiry and redispatch", "Push notifications", "Payment void/capture reconciliation", "Settlement and payout", "Location retention cleanup"],
   security: ["Object-level authorization binds restaurant and courier resources to caller", "Courier sees customer address only for assigned active delivery", "Location access is short-lived, encrypted, and audited", "Signed, deduplicated provider webhooks", "Server recomputes all prices, fees, and payable amounts", "Rate-limit order creation, offers, and location ingestion independently", "Support overrides require reason and step-up authentication"],
-  observability: baseObservability("assignment latency, unassigned delivery age, and late-delivery rate"),
+  observability: { logs: ["Restaurant acceptance, offer, assignment, pickup, and completion transitions with order/delivery ids", "Candidate-filter reasons and courier-offer expiry without storing raw location history in logs", "Settlement component and provider reconciliation outcome"], metrics: ["Restaurant acceptance latency and timeout rate", "Time to first offer, assignment latency, and unassigned delivery age by city", "Courier location freshness and active delivery update lag", "Late pickup/delivery rate and settlement exception count"], traces: ["Trace order placement through restaurant acceptance and dispatch", "Trace completion through capture and participant settlement"], alerts: ["Growing accepted-but-unassigned delivery backlog", "City-level location freshness collapses", "Completed deliveries remain unsettled beyond the operating window"] },
   testing: [
     { layer: "Unit", coverage: "State machines, quote expiry, fee allocation, ETA fallback" },
     { layer: "Integration", coverage: "PostGIS service-area queries, assignment CAS, outbox, settlement constraints" },

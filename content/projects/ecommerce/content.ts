@@ -1,6 +1,6 @@
 import type { Project } from "@/lib/types";
 import meta from "./metadata.json";
-import { baseObservability, diagrams, scale } from "../helpers";
+import { diagrams, scale } from "../helpers";
 
 const project: Project = {
   ...meta,
@@ -72,7 +72,7 @@ const project: Project = {
   caching: { cache: ["Published catalog by locale", "Product media", "Facets and popular search results"], never: ["Available-to-promise during checkout", "Authoritative price at order creation", "Refundable amount"], policy: "Cache-aside with short TTL plus product-change invalidation; CDN assets use content hashes. Serve stale catalog on read failure but never bypass checkout validation." },
   jobs: ["Expire stock reservations", "Publish transactional outbox", "Index product changes", "Send receipts", "Poll carrier status", "Reconcile payment intents and refunds"],
   security: ["Object-level checks on every cart, order, address, and return", "Hosted payment fields keep card data outside the application boundary", "Signed provider webhooks with timestamp tolerance and replay deduplication", "Promotion and quantity inputs revalidated server-side", "Rate limits by account, IP, and checkout risk signals", "Audit privileged refunds and inventory adjustments with reason", "Prevent stored XSS in merchant-authored catalog content"],
-  observability: baseObservability("checkout conversion and inventory reservation conflicts"),
+  observability: { logs: ["Order, reservation, payment, and fulfillment transitions with request/order ids and reason—never addresses or payment tokens", "Checkout repricing differences and rejected stock invariants", "Outbox/worker attempt with event id and terminal outcome"], metrics: ["Checkout authorization failures and payment_pending age", "Inventory reservation conflict and expiry rate by SKU/location", "Order-to-allocation and allocation-to-dispatch latency", "Outbox age, fulfillment backlog, and refund reconciliation exceptions"], traces: ["Trace checkout across pricing, inventory transaction, provider authorization, outbox, and fulfillment", "Trace return receipt through refund initiation and provider convergence"], alerts: ["Confirmed orders without fulfillment work", "Payment-pending orders exceed reconciliation window", "Reserved exceeds on-hand invariant or reservation expiry worker stalls"] },
   testing: [
     { layer: "Unit", coverage: "Money arithmetic, promotion precedence, state machines, reservation expiry" },
     { layer: "Integration", coverage: "Real PostgreSQL constraints, row locking, outbox atomicity, provider adapter sandbox" },

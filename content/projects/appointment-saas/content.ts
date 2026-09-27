@@ -1,6 +1,6 @@
 import type { Project } from "@/lib/types";
 import meta from "./metadata.json";
-import { baseObservability, diagrams, scale } from "../helpers";
+import { diagrams, scale } from "../helpers";
 
 const project: Project = {
   ...meta, difficulty: "Intermediate",
@@ -26,7 +26,7 @@ const project: Project = {
   caching: { cache: ["Service catalog", "Availability rule versions", "Short-lived generated slot candidates"], never: ["Slot validity at confirm", "Tenant membership", "Deposit result"], policy: "Cache candidate reads briefly by rule version; booking always attempts the database constraint." },
   jobs: ["Expire holds", "Send version-checked reminders", "Calendar push/pull sync", "Reconcile deposits", "Apply tenant retention"],
   security: ["Tenant scope derived from authenticated membership", "Object authorization for appointment and practitioner", "Signed booking links are scoped, expiring, and hashed at rest", "Webhook signature/replay verification", "Escape customer-entered text in notifications", "Rate-limit public slot enumeration and booking", "Keep sensitive notes out of calendar descriptions by default"],
-  observability: baseObservability("booking conflicts, hold expiry, reminder lateness, and calendar sync lag"),
+  observability: { logs: ["Hold, confirm, reschedule, and cancel transitions with tenant, appointment version, and policy result", "Timezone/rule version used to generate a selected slot", "Calendar provider event id, echo suppression, and sync outcome"], metrics: ["Slot-query latency and confirmation conflict rate", "Hold conversion/expiry and late-deposit resolution count", "Reminder scheduling lateness and send suppression by stale version", "Calendar sync lag, webhook duplication, and provider error rate"], traces: ["Trace slot discovery through range-constraint booking and deposit confirmation", "Trace reschedule through new capacity reservation, old release, and provider sync"], alerts: ["Reminder queue is late enough to miss customer windows", "Calendar sync lag exceeds tenant promise", "Confirmed appointment count diverges from active capacity"] },
   testing: [{ layer: "Unit", coverage: "Recurrence and DST fixtures, cancellation policy, appointment state machine" }, { layer: "Integration", coverage: "PostgreSQL range conflicts, tenant boundaries, outbox" }, { layer: "Contract", coverage: "Calendar/provider webhook payloads" }, { layer: "Concurrency", coverage: "Two confirms and concurrent reschedule" }, { layer: "Failure", coverage: "Late payment, stale reminder, provider outage" }, { layer: "End-to-end", coverage: "Discover → hold → confirm → remind → reschedule/cancel" }],
   deployment: [{ stage: "Stage 1", stack: "Next.js, modular API, PostgreSQL, queue worker, email/calendar providers" }, { stage: "Stage 2", stack: "API replicas, Redis candidate cache, provider-specific sync workers, read replica" }, { stage: "Stage 3", stack: "Tenant cohorts and isolated enterprise databases where compliance/volume justify it" }],
   scale: scale("Replicate stateless API; cache candidate slots; isolate reminder and calendar workers", "Partition tenants into cohorts; route a tenant to one booking writer and provide enterprise isolation where justified"),
