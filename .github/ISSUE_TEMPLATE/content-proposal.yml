@@ -1,0 +1,32 @@
+name: Content proposal
+description: Propose a project, pattern, edge case, correction, or diagram improvement.
+title: "content: "
+labels: [content]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Contribution type
+      options: [Correction, Existing project improvement, Pattern, Edge case, Diagram, New project proposal, Translation]
+    validations:
+      required: true
+  - type: textarea
+    id: gap
+    attributes:
+      label: What gap does this address?
+    validations:
+      required: true
+  - type: textarea
+    id: depth
+    attributes:
+      label: Domain-specific decisions and evidence
+      description: Explain invariants, failures, tradeoffs, or sources. A renamed architecture is not enough.
+    validations:
+      required: true
+  - type: checkboxes
+    id: originality
+    attributes:
+      label: Confirmation
+      options:
+        - label: I will not include proprietary material, production secrets, or unsupported performance claims.
+          required: true

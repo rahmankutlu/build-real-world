@@ -1,0 +1,9 @@
+// Copy this directory to a kebab-case slug and add metadata.json.
+// A Project must cover: purpose/assumptions/non-goals, workflows, requirements,
+// NFR decisions, roles, domain relationships, focused tables and indexes,
+// transactions/retention, resource APIs, relevant events, 5+ failures,
+// consistency/concurrency, caching/jobs, 5+ security controls, observability,
+// unit/integration/contract/E2E/concurrency/failure tests, deployment,
+// 1K/100K/1M+ workload scenarios, and three readable Mermaid diagrams.
+// Import `Project` from `@/lib/types` and register the completed content in
+// `content/projects/index.ts`. Run `npm run validate` before opening a PR.

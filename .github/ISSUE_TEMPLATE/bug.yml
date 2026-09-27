@@ -1,0 +1,32 @@
+name: Bug report
+description: Report a reproducible site, build, validation, or content defect.
+title: "bug: "
+labels: [bug]
+body:
+  - type: textarea
+    id: observed
+    attributes:
+      label: What happened?
+      description: Include the page or content slug and the observed behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction or evidence
+      description: Commands, browser, screenshots, references, or a minimal example.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Security
+      options:
+        - label: This report does not disclose a vulnerability or private data.
+          required: true
