@@ -4,8 +4,12 @@ export function diagrams(nodes: string, architecture: string, sequence: string):
   return { context: `flowchart LR\n${nodes}`, architecture: `flowchart LR\n${architecture}`, sequence: `sequenceDiagram\n${sequence}` };
 }
 
-export const scale = (middle: string, large: string): Project["scale"] => [
-  { users: "1K users", architecture: "One stateless application, PostgreSQL, a worker, managed object storage where needed", pressure: "Optimize for operability; measure before splitting services" },
-  { users: "100K users", architecture: middle, pressure: "Add replicas, queues, and caches only around measured contention or latency" },
-  { users: "1M+ users", architecture: large, pressure: "Partition along explicit domain or data ownership boundaries; preserve correctness invariants" },
-];
+type ScaleStage = [architecture: string, decisionRule: string];
+
+export function scale(stages: { start: ScaleStage; middle: ScaleStage; large: ScaleStage }): Project["scale"] {
+  return [
+    { users: "1K users", architecture: stages.start[0], pressure: stages.start[1] },
+    { users: "100K users", architecture: stages.middle[0], pressure: stages.middle[1] },
+    { users: "1M+ users", architecture: stages.large[0], pressure: stages.large[1] },
+  ];
+}

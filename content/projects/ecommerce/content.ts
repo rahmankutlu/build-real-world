@@ -86,7 +86,7 @@ const project: Project = {
     { stage: "Stage 2", stack: "Load balancer, API replicas, Redis catalog cache, managed queue, search engine, PostgreSQL primary/read replica" },
     { stage: "Stage 3", stack: "Separate catalog/search from transactional ordering; partition inventory by region only after measured contention" },
   ],
-  scale: scale("API replicas; Redis for catalog; search service; worker pools; database read replicas while writes remain primary-owned", "Regional catalog edges and partitioned order/stock ownership; separate fulfillment and search workloads; never multi-writer inventory without an explicit conflict model"),
+  scale: scale({ start: ["One API and worker, PostgreSQL for orders and stock, managed object storage for product images", "Keep stock reservation and order creation in one PostgreSQL transaction; measure reservation lock waits before adding infrastructure"], middle: ["API replicas; Redis for catalog; search service; worker pools; database read replicas while writes remain primary-owned", "Add Redis and search when catalog reads dominate; replicas never answer stock questions during checkout"], large: ["Regional catalog edges and partitioned order/stock ownership; separate fulfillment and search workloads; never multi-writer inventory without an explicit conflict model", "Split stock ownership by warehouse or region only after hot-SKU lock contention is measured; each SKU keeps one writer"] }),
   diagrams: diagrams(
     "Customer --> Storefront\nStorefront --> CommerceAPI\nCommerceAPI --> PaymentProvider\nCommerceAPI --> Carrier",
     "Storefront --> API\nAPI --> PostgreSQL\nAPI --> Redis\nAPI --> Search\nAPI --> PaymentProvider\nPostgreSQL --> OutboxWorker\nOutboxWorker --> Queue\nQueue --> FulfillmentWorker",

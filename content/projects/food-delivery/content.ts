@@ -82,7 +82,7 @@ const project: Project = {
     { stage: "Stage 2", stack: "Replica APIs, separate dispatch workers, partitioned realtime channels, read replica for restaurant browsing" },
     { stage: "Stage 3", stack: "City-owned dispatch partitions and regional event streams; settlement remains separately controlled" },
   ],
-  scale: scale("Scale reads, realtime gateways, and dispatch workers by city; isolate location writes from order PostgreSQL", "Assign city/region ownership for dispatch and location streams; keep order/settlement invariants within a single writer boundary"),
+  scale: scale({ start: ["One API, PostgreSQL with PostGIS for orders and delivery zones, a dispatch worker, a WebSocket gateway for order status", "Run one dispatcher per city; courier locations may be dropped or stale, order state may not"], middle: ["Scale reads, realtime gateways, and dispatch workers by city; isolate location writes from order PostgreSQL", "Move courier location writes off the order database once they compete with order transactions"], large: ["Assign city/region ownership for dispatch and location streams; keep order/settlement invariants within a single writer boundary", "Give each city one dispatch owner; cross-city work happens only in reporting and settlement batches"] }),
   diagrams: diagrams(
     "Customer --> Platform\nRestaurant --> Platform\nCourier --> Platform\nPlatform --> PaymentProvider\nPlatform --> MapsProvider",
     "Apps --> API\nAPI --> PostgreSQL\nAPI --> Redis\nAPI --> Queue\nCourierApp --> LocationIngest\nLocationIngest --> RealtimeGateway\nQueue --> DispatchWorker\nQueue --> SettlementWorker",
