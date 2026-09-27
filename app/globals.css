@@ -152,7 +152,9 @@ code { padding: 2px 5px; border-radius: 3px; color: var(--accent); background: v
 .diagram-expand, .dialog-bar button { padding: 0; border: 0; color: var(--accent); background: transparent; font-weight: 650; cursor: pointer; }
 .diagram-expand:disabled { color: var(--muted); cursor: wait; opacity: .65; }
 .diagram { width: 100%; max-width: 100%; min-height: 170px; margin: 0; padding: 18px; overflow: auto; border: 1px solid var(--line); color: var(--ink); background: var(--surface); }
-.diagram svg { display: block; min-width: 640px; max-width: none; height: auto; margin-inline: auto; }
+.diagram svg { display: block; height: auto; margin-inline: auto; }
+/* Natural size when it fits; otherwise at least 70% of natural size, scrolling inside the frame. */
+.diagram-canvas svg { width: min(var(--diagram-width, 100%), max(100%, calc(var(--diagram-width, 100%) * .7))) !important; max-width: none !important; }
 .diagram-error, .diagram-loading { display: block; margin: 0; color: var(--muted); font-size: 13px; }
 .diagram-error { max-width: 100%; overflow-wrap: anywhere; }
 .mermaid-render-host { position: fixed; top: 0; left: -10000px; width: 1200px; visibility: hidden; pointer-events: none; contain: layout; }
@@ -160,7 +162,7 @@ code { padding: 2px 5px; border-radius: 3px; color: var(--accent); background: v
 .diagram-dialog::backdrop { background: rgb(5 10 8 / 72%); }
 .dialog-bar { display: flex; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid var(--line); }
 .diagram.enlarged { max-height: 78vh; border: 0; }
-.diagram.enlarged svg { min-width: 900px; }
+.diagram.enlarged .diagram-canvas svg { width: max(var(--diagram-width, 100%), min(100%, calc(var(--diagram-width, 100%) * 1.6))) !important; }
 .failure { margin: 12px 0; padding: 16px; border: 1px solid var(--line); background: var(--surface); }
 .failure h3 { margin: 0 0 6px; }
 .failure p { margin: 5px 0; }
@@ -168,7 +170,8 @@ code { padding: 2px 5px; border-radius: 3px; color: var(--accent); background: v
 .rail { position: sticky; top: 86px; padding: 16px; border: 1px solid var(--line); background: var(--surface); font-size: 13px; }
 .rail-row { display: flex; justify-content: space-between; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--line); }
 .rail-row:last-child { border: 0; }
-.rail-row span:first-child { color: var(--muted); }
+.rail-row span:first-child { flex-shrink: 0; color: var(--muted); white-space: nowrap; }
+.rail-row b { text-align: right; }
 
 .search-page { min-height: 70vh; padding: 60px 0; }
 .search-page h1 { margin: 0 0 8px; font-size: 42px; letter-spacing: -.045em; }

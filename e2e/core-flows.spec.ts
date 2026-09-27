@@ -20,6 +20,7 @@ test("opens project, navigates sections, and enlarges a diagram", async ({ page 
     .locator("figure")
     .filter({ hasText: "Payment Platform application architecture" })
     .first();
+  await figure.scrollIntoViewIfNeeded();
   await expect(figure.locator(":scope > .diagram svg")).toBeVisible();
   await figure.getByRole("button", { name: "Enlarge" }).click();
   await expect(

@@ -1,7 +1,7 @@
 import type { Project } from "@/lib/types";
 
 export function diagrams(nodes: string, architecture: string, sequence: string): Project["diagrams"] {
-  return { context: `flowchart LR\n${nodes}`, architecture: `flowchart LR\n${architecture}`, sequence: `sequenceDiagram\n${sequence}` };
+  return { context: `flowchart LR\n${nodes}`, architecture: `flowchart TB\n${architecture}`, sequence: `sequenceDiagram\n${sequence}` };
 }
 
 type ScaleStage = [architecture: string, decisionRule: string];

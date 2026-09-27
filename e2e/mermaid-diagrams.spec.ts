@@ -19,6 +19,15 @@ async function expectNoMermaidErrors(page: Page) {
   expect(escapedArtifacts).toBe(0);
 }
 
+/** Diagrams render as they approach the viewport; bring each one into view. */
+async function revealDiagrams(page: Page) {
+  const figures = page.locator(".diagram-frame");
+  for (let index = 0; index < (await figures.count()); index += 1) {
+    await figures.nth(index).scrollIntoViewIfNeeded();
+    await expect(figures.nth(index)).toHaveAttribute("data-diagram-state", "rendered");
+  }
+}
+
 async function expectMeasuredDiagrams(page: Page) {
   const diagrams = await page.locator(".diagram-frame > .diagram svg").evaluateAll((svgs) =>
     svgs.map((svg) => {
@@ -46,6 +55,10 @@ async function expectMeasuredDiagrams(page: Page) {
     expect(diagram.viewBoxHeight).toBeGreaterThan(100);
     expect(diagram.labels).toBeGreaterThan(0);
     expect(diagram.unmeasuredLabels).toBe(0);
+    // Mermaid lays text out at 16px; the rendered scale must keep labels legible and never upscale.
+    const labelPx = (16 * diagram.width) / diagram.viewBoxWidth;
+    expect(labelPx).toBeGreaterThanOrEqual(11);
+    expect(diagram.width).toBeLessThanOrEqual(diagram.viewBoxWidth + 1);
   }
 }
 
@@ -64,6 +77,7 @@ test("renders every project diagram safely across themes", async ({ page }) => {
       await expect(figures.filter({ hasText: `${project.title} ${label}` })).toHaveCount(1);
     }
 
+    await revealDiagrams(page);
     await expect(figures.filter({ has: page.locator(":scope > .diagram svg") })).toHaveCount(3);
     await expect(figures.locator(":scope > .diagram svg")).toHaveCount(3);
     await expect(page.locator('.diagram-frame[data-diagram-state="rendered"]')).toHaveCount(3);
@@ -101,6 +115,7 @@ for (const slug of ["ecommerce", "payment-platform"]) {
     await page.goto(`./projects/${slug}/`);
 
     const figure = page.locator(".diagram-frame").filter({ hasText: `${project.title} workflow sequence` });
+    await figure.scrollIntoViewIfNeeded();
     await expect(figure).toHaveAttribute("data-diagram-state", "rendered");
     await expect(figure.locator(":scope > .diagram svg")).toBeVisible();
     await expect(figure.locator(":scope > .diagram svg")).toContainText("Idempotency-Key");
@@ -120,6 +135,7 @@ test("keeps diagrams usable on a mobile viewport", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("./projects/payment-platform/");
 
+  await revealDiagrams(page);
   await expect(page.locator('.diagram-frame[data-diagram-state="rendered"]')).toHaveCount(3);
   await expectNoMermaidErrors(page);
 
@@ -141,3 +157,25 @@ test("keeps diagrams usable on a mobile viewport", async ({ page }) => {
   await figure.getByRole("button", { name: "Enlarge" }).click();
   await expect(page.getByRole("dialog", { name: "Enlarged Payment Platform workflow sequence" }).locator(".diagram svg")).toBeVisible();
 });
+
+test("renders diagrams only as they approach the viewport", async ({ page }) => {
+  await page.goto("./projects/ecommerce/");
+  await expect(page.getByRole("heading", { name: "E-commerce Platform", level: 1 })).toBeVisible();
+  await expect(page.locator('.diagram-frame[data-diagram-state="rendering"]')).toHaveCount(3);
+  await expect(page.locator('.diagram-frame[data-diagram-state="rendered"]')).toHaveCount(0);
+
+  await page.locator("#architecture").scrollIntoViewIfNeeded();
+  await expect(page.locator(".diagram-frame").first()).toHaveAttribute("data-diagram-state", "rendered");
+  await expectNoMermaidErrors(page);
+});
+
+for (const target of ["failures", "observability", "related"]) {
+  test(`lands on #${target} after a table-of-contents jump past the diagrams`, async ({ page }) => {
+    await page.goto("./projects/payment-platform/");
+    await page.getByRole("complementary", { name: "On this page" }).locator(`a[href="#${target}"]`).click();
+    await expect(page).toHaveURL(new RegExp(`#${target}$`));
+    // Let lazy diagrams and any late layout settle, then the target must still be on screen.
+    await page.waitForTimeout(1500);
+    await expect(page.locator(`#${target}`)).toBeInViewport();
+  });
+}

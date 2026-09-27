@@ -5,12 +5,19 @@ import { useEffect, useId, useRef, useState } from "react";
 type DiagramTheme = "dark" | "neutral";
 type RenderState =
   | { status: "rendering"; svg: ""; theme?: undefined }
-  | { status: "rendered"; svg: string; theme: DiagramTheme }
+  | { status: "rendered"; svg: string; theme: DiagramTheme; width: number }
   | { status: "error"; svg: ""; theme?: undefined };
 
 let mermaidPromise: Promise<(typeof import("mermaid"))["default"]> | undefined;
 let renderQueue = Promise.resolve();
 let initializedTheme: DiagramTheme | undefined;
+
+// Intrinsic width from the root viewBox; drives the CSS sizing policy so small
+// diagrams are never upscaled and wide ones stay legible by scrolling.
+function naturalWidth(svg: string) {
+  const viewBox = /<svg[^>]*\sviewBox="[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)/.exec(svg);
+  return viewBox ? Math.ceil(Number(viewBox[1])) : 0;
+}
 
 function removeRenderArtifacts(id: string, container: HTMLElement) {
   container.replaceChildren();
@@ -73,6 +80,39 @@ export function MermaidDiagram({ chart, label }: { chart: string; label: string 
   const renderAttempt = useRef(0);
   const renderHostRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const figureRef = useRef<HTMLElement>(null);
+  // Render only once the diagram approaches the viewport: pages load the Mermaid
+  // runtime lazily, and diagrams skipped by an in-page jump keep their placeholder
+  // height instead of shifting the target while the browser scrolls to it.
+  // Without IntersectionObserver (older browsers, test DOMs) render immediately.
+  const [nearViewport, setNearViewport] = useState(() => typeof IntersectionObserver === "undefined");
+
+  useEffect(() => {
+    const figure = figureRef.current;
+    if (!figure || typeof IntersectionObserver === "undefined") return;
+    // Wait until scrolling has been idle before rendering. A smooth in-page jump
+    // emits scroll events every frame, so diagrams it passes never render (and
+    // change layout) mid-scroll; afterwards native scroll anchoring keeps the
+    // reader's position when a diagram above the viewport grows.
+    let near = false;
+    let idle: ReturnType<typeof setTimeout> | undefined;
+    const stop = () => {
+      clearTimeout(idle);
+      observer.disconnect();
+      window.removeEventListener("scroll", armIdleTimer);
+    };
+    const armIdleTimer = () => {
+      clearTimeout(idle);
+      if (near) idle = setTimeout(() => { stop(); setNearViewport(true); }, 250);
+    };
+    const observer = new IntersectionObserver((entries) => {
+      near = entries.some((entry) => entry.isIntersecting);
+      armIdleTimer();
+    }, { rootMargin: "400px 0px" });
+    observer.observe(figure);
+    window.addEventListener("scroll", armIdleTimer, { passive: true });
+    return stop;
+  }, []);
 
   useEffect(() => {
     const rerender = () => setThemeRevision((value) => value + 1);
@@ -82,7 +122,7 @@ export function MermaidDiagram({ chart, label }: { chart: string; label: string 
 
   useEffect(() => {
     const container = renderHostRef.current;
-    if (!container) return;
+    if (!container || !nearViewport) return;
 
     const controller = new AbortController();
     const id = `mermaid-${reactId}-${themeRevision}-${++renderAttempt.current}`;
@@ -92,7 +132,7 @@ export function MermaidDiagram({ chart, label }: { chart: string; label: string 
 
     renderMermaid(chart, id, theme, container, controller.signal).then(
       (svg) => {
-        if (!controller.signal.aborted) setRenderState({ status: "rendered", svg, theme });
+        if (!controller.signal.aborted) setRenderState({ status: "rendered", svg, theme, width: naturalWidth(svg) });
       },
       () => {
         removeRenderArtifacts(id, container);
@@ -104,12 +144,16 @@ export function MermaidDiagram({ chart, label }: { chart: string; label: string 
       controller.abort();
       removeRenderArtifacts(id, container);
     };
-  }, [chart, reactId, themeRevision]);
+  }, [chart, nearViewport, reactId, themeRevision]);
 
   const rendered = renderState.status === "rendered";
+  const sizing = rendered && renderState.width > 0
+    ? ({ "--diagram-width": `${renderState.width}px` } as React.CSSProperties)
+    : undefined;
 
   return (
     <figure
+      ref={figureRef}
       className="diagram-frame"
       data-diagram-state={renderState.status}
       data-diagram-theme={rendered ? renderState.theme : undefined}
@@ -129,7 +173,7 @@ export function MermaidDiagram({ chart, label }: { chart: string; label: string 
         {renderState.status === "error" ? (
           <p className="diagram-error" role="status">Diagram unavailable.</p>
         ) : rendered ? (
-          <div dangerouslySetInnerHTML={{ __html: renderState.svg }} />
+          <div className="diagram-canvas" style={sizing} dangerouslySetInnerHTML={{ __html: renderState.svg }} />
         ) : (
           <span className="diagram-loading">Rendering diagram…</span>
         )}
@@ -141,7 +185,9 @@ export function MermaidDiagram({ chart, label }: { chart: string; label: string 
           <button type="button" onClick={() => dialogRef.current?.close()}>Close</button>
         </div>
         {rendered ? (
-          <div className="diagram enlarged" dangerouslySetInnerHTML={{ __html: renderState.svg }} />
+          <div className="diagram enlarged">
+            <div className="diagram-canvas" style={sizing} dangerouslySetInnerHTML={{ __html: renderState.svg }} />
+          </div>
         ) : null}
       </dialog>
     </figure>
