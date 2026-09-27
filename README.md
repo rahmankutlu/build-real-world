@@ -1,113 +1,116 @@
 # Build Real World
 
-**Learn software engineering by designing production-grade systems from scratch.**
+**Production-grade system design, one real-world product at a time.**
+
+Learn how applications are shaped by transactions, concurrency, failures, queues, caching, authorization, observability, and scale—not just by boxes in an architecture diagram.
 
 [![CI](https://github.com/rahmankutlu/build-real-world/actions/workflows/ci.yml/badge.svg)](https://github.com/rahmankutlu/build-real-world/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/code-MIT-176b52.svg)](LICENSE)
-[![Content: CC BY 4.0](https://img.shields.io/badge/content-CC_BY_4.0-176b52.svg)](LICENSE)
+[![CodeQL](https://github.com/rahmankutlu/build-real-world/actions/workflows/codeql.yml/badge.svg)](https://github.com/rahmankutlu/build-real-world/actions/workflows/codeql.yml)
+[![Pages](https://github.com/rahmankutlu/build-real-world/actions/workflows/pages.yml/badge.svg)](https://github.com/rahmankutlu/build-real-world/actions/workflows/pages.yml)
+[![Next.js](https://img.shields.io/badge/Next.js-16-181817?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Code: MIT](https://img.shields.io/badge/code-MIT-176b52.svg)](LICENSE)
+[![Content: CC BY 4.0](https://img.shields.io/badge/content-CC_BY_4.0-176b52.svg)](LICENSE-CONTENT)
 
-![Build Real World project explorer](docs/site-preview.png)
+[**Open the live site**](https://rahmankutlu.github.io/build-real-world/) · [**Explore the projects**](https://rahmankutlu.github.io/build-real-world/#projects) · [**Contribute**](CONTRIBUTING.md)
 
-**Live demo:** https://build-real-world.dev _(placeholder until the first deployment)_
+![Build Real World — production-grade system design](public/social-preview.png)
 
-Build Real World is an open-source, static-first knowledge platform for learning how real products are designed. It follows each system from users and workflows through data, APIs, transactions, asynchronous work, failure recovery, security, observability, testing, deployment, and evidence-driven scaling.
+## Why this is different
 
-It is not a clone tutorial, an interview cheat sheet, or a gallery of unexplained architecture boxes.
+Build Real World starts with a product and follows the decisions required to keep it correct when requests race, providers time out, messages repeat, permissions change, and workloads grow.
 
-## Featured projects
+| Typical short-form material | Build Real World |
+| --- | --- |
+| Happy-path feature walkthrough | Failure modes and recovery behavior |
+| CRUD tables | Constraints, invariants, indexes, and transaction boundaries |
+| Static architecture snapshot | Evolution from a small deployment to workload-driven partitions |
+| Endpoint list | Permissions, idempotency, pagination, and status semantics |
+| “Add Redis” | What is safe to cache, what is not, and how it is invalidated |
+| “Use a queue” | Producer/consumer ownership, retries, deduplication, and dead letters |
 
-- [E-commerce Platform](content/projects/ecommerce/) — stock reservation, checkout, fulfillment, and returns
-- [Food Delivery Platform](content/projects/food-delivery/) — merchant acceptance, dispatch, geospatial state, and settlement
-- [Ride Hailing Platform](content/projects/ride-hailing/) — driver matching, location churn, and acceptance races
-- [Video Streaming Platform](content/projects/video-streaming/) — resumable ingest, transcode pipelines, immutable media, and CDN delivery
-- [Payment Platform](content/projects/payment-platform/) — safe provider orchestration, idempotency, ledger concepts, and reconciliation
+This is not a claim that every example is ready to deploy unchanged. It is a practical reference for learning how product rules become engineering boundaries.
 
-## Why this exists
+## What is inside
 
-Software architecture is not the act of drawing services. It is the process of turning product constraints into boundaries that remain understandable when requests race, providers time out, queues redeliver, permissions change, and workloads grow.
+- **10 flagship system designs** covering commerce, logistics, SaaS, media, social, storage, and payments.
+- **17 engineering patterns** with use cases, counterexamples, minimal implementations, and tradeoffs.
+- **30 edge cases** that explain the failure mechanism, resulting bug, and mitigation.
+- **Four learning paths** for backend foundations, distributed systems, realtime systems, and SaaS architecture.
+- **Full-text search and architecture comparison** across the static content graph.
 
-Each case study answers the same core questions while preserving what is different about its domain:
+Every flagship project includes actors and requirements, domain relationships, a focused relational schema, realistic APIs, event boundaries, concurrency controls, caching, background jobs, security, observability, testing, deployment stages, and three Mermaid diagrams.
 
-- What are we building, for whom, and what is deliberately out of scope?
-- Which invariants require a transaction, constraint, version, or lock?
-- Which results may converge asynchronously?
-- How do retries, duplicate messages, stale caches, and partial failures behave?
-- What are the authorization and privacy boundaries?
-- Which logs, metrics, traces, alerts, and tests demonstrate that it works?
-- How can the architecture evolve from a small deployment without inventing scale?
+## Flagship systems
 
-## The v0.1 project set
+| Project | Difficulty | Core engineering problems | Key concepts |
+| --- | --- | --- | --- |
+| [E-commerce Platform](https://rahmankutlu.github.io/build-real-world/projects/ecommerce/) | Advanced | Inventory consistency, checkout, fulfillment | Transactions, locking, idempotency |
+| [Food Delivery Platform](https://rahmankutlu.github.io/build-real-world/projects/food-delivery/) | Expert | Menu volatility, courier dispatch, settlement | Geospatial, sagas, WebSockets |
+| [Ride Hailing Platform](https://rahmankutlu.github.io/build-real-world/projects/ride-hailing/) | Expert | Matching races, location streams, trip ownership | Realtime, geospatial, concurrency |
+| [Hotel PMS](https://rahmankutlu.github.io/build-real-world/projects/hotel-pms/) | Advanced | Nightly inventory, folios, business dates | Multi-tenancy, audit logs, timezones |
+| [Appointment SaaS](https://rahmankutlu.github.io/build-real-world/projects/appointment-saas/) | Intermediate | Slot contention, recurrence, calendar drift | Scheduling, webhooks, optimistic locking |
+| [Project Management](https://rahmankutlu.github.io/build-real-world/projects/project-management/) | Advanced | Concurrent edits, ACLs, activity fan-out | Authorization, realtime, pagination |
+| [Video Streaming](https://rahmankutlu.github.io/build-real-world/projects/video-streaming/) | Expert | Media ingest, processing recovery, delivery | Queues, object storage, CDN |
+| [Social Network](https://rahmankutlu.github.io/build-real-world/projects/social-network/) | Expert | Feed fan-out, graph privacy, moderation | Eventual consistency, caching, abuse controls |
+| [Cloud File Storage](https://rahmankutlu.github.io/build-real-world/projects/cloud-file-storage/) | Advanced | Resumable uploads, ACLs, quotas, sync | Object storage, background jobs, tenancy |
+| [Payment Platform](https://rahmankutlu.github.io/build-real-world/projects/payment-platform/) | Expert | Ambiguous outcomes, refunds, reconciliation | Ledger concepts, webhooks, idempotency |
 
-| Project | Difficulty | Distinctive engineering concerns |
-| --- | --- | --- |
-| E-commerce Platform | Advanced | inventory, transactional checkout, fulfillment |
-| Food Delivery Platform | Expert | menu volatility, courier dispatch, live delivery |
-| Ride Hailing Platform | Expert | matching races, location streams, trip ownership |
-| Hotel PMS | Advanced | nightly inventory, folios, business date, tenant isolation |
-| Appointment SaaS | Intermediate | recurrence, holds, time zones, calendar convergence |
-| Project Management Platform | Advanced | optimistic collaboration, ACLs, activity fan-out |
-| Video Streaming Platform | Expert | media pipelines, immutable objects, CDN delivery |
-| Social Network | Expert | hybrid feed fan-out, graph privacy, moderation |
-| Cloud File Storage | Advanced | resumable upload, namespace/ACLs, scanning, quota |
-| Payment Platform | Expert | provider ambiguity, idempotency, ledger, reconciliation |
+## See the platform
 
-Every project includes product and functional requirements, roles, workflows, a domain model, focused PostgreSQL schema, resource-oriented APIs, relevant events, at least five failure modes, consistency and concurrency decisions, caching, jobs, security, observability, tests, deployment stages, workload-scenario evolution, and three Mermaid diagrams.
+![Project explorer in the Build Real World web app](docs/site-preview.png)
 
-## Engineering library
+The web app is static-first: content and routes are generated at build time; search, filters, comparison, theme switching, and Mermaid rendering run in the browser. No account, backend, analytics, or tracker is required.
 
-The platform currently contains:
+## Quick start
 
-- 17 pattern guides, including idempotency keys, outbox, sagas, locking, retries, caching, webhooks, pagination, multi-tenancy, jobs, and audit logs.
-- 30 edge cases organized across payments, booking, authentication, uploads, realtime, messaging, notifications, inventory, tenancy, time zones, and distributed systems.
-- Four learning paths for backend foundations, distributed systems, realtime systems, and SaaS architecture.
-- Metadata-driven architecture comparison and client-side full-text search.
+### Browse online
 
-Complex patterns are not presented as badges of maturity. Every guide states when not to use the pattern and what it costs.
+Open **https://rahmankutlu.github.io/build-real-world/**. A useful first path is [E-commerce Platform](https://rahmankutlu.github.io/build-real-world/projects/ecommerce/) → [Appointment SaaS](https://rahmankutlu.github.io/build-real-world/projects/appointment-saas/) → [Payment Platform](https://rahmankutlu.github.io/build-real-world/projects/payment-platform/).
 
-## Local development
-
-Requirements: Node.js 20.9 or newer and npm.
+### Run locally
 
 ```bash
-npm install
+git clone https://github.com/rahmankutlu/build-real-world.git
+cd build-real-world
+npm ci
 npm run dev
 ```
 
 Open http://localhost:3000.
 
+Run the complete local quality gate:
+
 ```bash
-npm run lint
-npm run typecheck
-npm test
-npm run validate
+npm run check
 npm run build
 npx playwright install chromium
 npm run test:e2e
 ```
 
-`next build` produces a static export in `out/`. Set `NEXT_PUBLIC_SITE_URL` to the canonical deployment origin when building for production. For a repository-scoped GitHub Pages site, also set `NEXT_PUBLIC_BASE_PATH=/repository-name`; the included Pages workflow does this automatically.
+Validate the exact GitHub Pages base path:
 
-## Architecture
-
-```text
-Version-controlled TypeScript + JSON content
-                    │
-                    ▼
-      Zod schema and reference validation
-                    │
-                    ▼
-       Next.js App Router static generation
-          │              │             │
-          ▼              ▼             ▼
-    Project pages    Search index    Atom/sitemap
-          │
-          ▼
-  Static host / GitHub Pages
+```bash
+npm run build:pages
 ```
 
-There is no application backend in v0.1. Mermaid is rendered client-side, while the content and routes are generated at build time. Search and comparison operate on the static corpus in the browser.
+## How the repository works
 
-## Repository map
+```text
+content metadata + typed case studies
+                │
+                ▼
+   Zod, references, links, SEO checks
+                │
+                ▼
+      Next.js static generation
+       │          │          │
+       ▼          ▼          ▼
+  content pages  search   sitemap/feed
+                │
+                ▼
+        GitHub Pages artifact
+```
 
 ```text
 app/                 routes, metadata, sitemap, feed
@@ -115,27 +118,29 @@ components/          interactive UI and Mermaid renderer
 content/projects/    ten structured case studies + metadata
 content/patterns/    engineering pattern library
 content/edge-cases/  failure field guide
-content/learning-paths/
-lib/                 schemas and shared types
-scripts/             content and link validation
-tests/               unit/component tests
-e2e/                 Playwright core flows
+content/relationships.ts
+lib/                 schemas, URLs, SEO, shared types
+scripts/             content, link, SEO, and export validation
+tests/               unit and component tests
+e2e/                 Playwright browser flows
 ```
 
 ## Contributing
 
-Corrections, deeper failure analysis, schema improvements, diagrams, API examples, translations, edge cases, and well-scoped projects are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md). The project template and automated checks exist to keep contributions reviewable and prevent shallow filler.
+The most valuable contributions are often small and specific: correct an unsafe assumption, add a missing race, improve an index, sharpen a diagram, or explain why a pattern does not belong.
 
-Do not include proprietary architecture, credentials, production data, unsafe payment handling, or claims that an example is production-certified.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing a flagship system. New projects must meet the same depth and validation requirements as the existing ten; renamed architectures and invented scale claims are not accepted.
 
 ## Roadmap
 
-- **v0.1:** 10 flagship designs, patterns, 30 edge cases, paths, search, comparison, themes, static export, CI
-- **v0.2:** 20 projects, interactive database diagrams, deeper comparisons, translation foundation
-- **v0.3:** architecture playground, capacity-estimation exercises, failure injection scenarios
-- **v0.4:** community implementations, multiple stack examples, interactive quizzes
-- **v1.0:** stable content schema and contributor model, 50+ production-grade projects
+- **v0.1.x:** harden the public platform, content schema, validation, and contributor workflow.
+- **v0.2:** deeper comparisons, interactive database diagrams, and a translation foundation.
+- **v0.3:** capacity-estimation exercises and failure-injection scenarios.
+- **v1.0:** stable content schema and contributor model with a broader reviewed library.
 
 ## License
 
-Source code is licensed under the [MIT License](LICENSE). Educational prose, diagrams, and structured case-study content under `content/` and `docs/` are licensed under [Creative Commons Attribution 4.0 International](LICENSE). Contributions are accepted under the applicable license.
+- Application source, validation tooling, and automation: [MIT](LICENSE)
+- Educational prose, diagrams, project data, and documentation assets: [CC BY 4.0](LICENSE-CONTENT)
+
+Contributions are accepted under the license that applies to the files being changed. See [CONTRIBUTING.md](CONTRIBUTING.md#licensing-contributions) for details.

@@ -22,10 +22,23 @@ Use `content/projects/_template/content.ts.example` as the review checklist. Met
 ## Workflow
 
 1. Fork and create a focused branch.
-2. Install with `npm install`.
+2. Install the locked dependency graph with `npm ci`.
 3. Make a small, reviewable change.
-4. Run `npm run lint && npm run typecheck && npm test && npm run validate && npm run build`.
+4. Run `npm run check && npm run build`.
 5. For UI changes, run `npm run test:e2e` and include before/after screenshots.
 6. Open the pull request and explain the engineering reasoning, not only the edited files.
 
-By contributing, you agree that code is provided under MIT and educational content under CC BY 4.0 as described in [LICENSE](LICENSE).
+## Adding a project
+
+Start from [`content/projects/_template`](content/projects/_template/). A proposal must identify the actors, core invariant, source of truth, transaction boundary, retry behavior, concurrency risk, cache boundary, asynchronous work, security boundary, operational signals, and the workload pressure that justifies each scale transition.
+
+Register the finished project and its curated relationships, then run `npm run validate`. The validator rejects missing metadata, shallow failure/security coverage, broken references, duplicate slugs, generic observability, and incomplete diagrams.
+
+## Licensing contributions
+
+By contributing, you agree that:
+
+- source code, tests, scripts, configuration, and automation are provided under the [MIT License](LICENSE);
+- educational prose, diagrams, structured case-study content, and documentation assets are provided under [CC BY 4.0](LICENSE-CONTENT).
+
+You must have the right to submit the material. Do not include proprietary architecture, credentials, customer data, or text copied from restricted sources.

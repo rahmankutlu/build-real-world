@@ -1,0 +1,15 @@
+{
+  "slug": "replace-me",
+  "title": "Replace Me",
+  "summary": "Write a concrete 40–180 character summary of the system and its distinctive engineering constraints.",
+  "difficulty": "Advanced",
+  "primaryDb": "PostgreSQL",
+  "realtime": false,
+  "queue": true,
+  "payments": false,
+  "multiTenancy": false,
+  "eventDriven": true,
+  "topics": ["Transactions", "Idempotency", "Observability"],
+  "actors": ["Primary user", "Operator", "Administrator"],
+  "featured": false
+}
