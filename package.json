@@ -1,19 +1,22 @@
 {
   "name": "build-real-world",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
-  "description": "Learn software engineering by designing production-grade systems from scratch.",
+  "description": "Production-grade system design case studies, architecture patterns, failure modes, database models, APIs, and scaling strategies.",
   "license": "MIT",
   "scripts": {
     "dev": "next dev",
-    "build": "npm run validate && next build",
+    "build": "next build && tsx scripts/validate-export.ts",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "validate": "tsx scripts/validate-content.ts && tsx scripts/validate-links.ts"
+    "test:e2e:pages": "NEXT_PUBLIC_BASE_PATH=/build-real-world PLAYWRIGHT_BASE_URL=http://127.0.0.1:3000/build-real-world/ npm run test:e2e",
+    "validate": "tsx scripts/validate-content.ts && tsx scripts/validate-links.ts && tsx scripts/validate-seo.ts",
+    "check": "npm run lint && npm run typecheck && npm test && npm run validate",
+    "build:pages": "NEXT_PUBLIC_BASE_PATH=/build-real-world NEXT_PUBLIC_SITE_URL=https://rahmankutlu.github.io/build-real-world npm run build"
   },
   "dependencies": {
     "@tailwindcss/postcss": "4.3.3",
