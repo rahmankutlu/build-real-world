@@ -14,7 +14,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:pages": "NEXT_PUBLIC_BASE_PATH=/build-real-world PLAYWRIGHT_BASE_URL=http://127.0.0.1:3000/build-real-world/ npm run test:e2e",
-    "validate": "tsx scripts/validate-content.ts && tsx scripts/validate-links.ts && tsx scripts/validate-seo.ts",
+    "validate": "tsx scripts/validate-content.ts && tsx scripts/validate-mermaid.ts && tsx scripts/validate-links.ts && tsx scripts/validate-seo.ts",
     "check": "npm run lint && npm run typecheck && npm test && npm run validate",
     "build:pages": "NEXT_PUBLIC_BASE_PATH=/build-real-world NEXT_PUBLIC_SITE_URL=https://rahmankutlu.github.io/build-real-world npm run build"
   },
