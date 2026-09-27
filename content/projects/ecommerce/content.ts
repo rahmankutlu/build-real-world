@@ -90,7 +90,7 @@ const project: Project = {
   diagrams: diagrams(
     "Customer --> Storefront\nStorefront --> CommerceAPI\nCommerceAPI --> PaymentProvider\nCommerceAPI --> Carrier",
     "Storefront --> API\nAPI --> PostgreSQL\nAPI --> Redis\nAPI --> Search\nAPI --> PaymentProvider\nPostgreSQL --> OutboxWorker\nOutboxWorker --> Queue\nQueue --> FulfillmentWorker",
-    "Customer->>API: POST /orders + Idempotency-Key\nAPI->>PostgreSQL: lock stock; create reservation + pending order\nAPI->>PaymentProvider: authorize(reference)\nalt authorized\nPaymentProvider-->>API: authorized\nAPI->>PostgreSQL: confirm order + outbox\nAPI-->>Customer: 201 confirmed\nelse timeout\nAPI->>PostgreSQL: retain payment_pending\nAPI-->>Customer: 202 pending\nend"
+    "Customer->>API: POST /orders + Idempotency-Key\nAPI->>PostgreSQL: lock stock, create reservation + pending order\nAPI->>PaymentProvider: authorize(reference)\nalt authorized\nPaymentProvider-->>API: authorized\nAPI->>PostgreSQL: confirm order + outbox\nAPI-->>Customer: 201 confirmed\nelse timeout\nAPI->>PostgreSQL: retain payment_pending\nAPI-->>Customer: 202 pending\nend"
   ),
 };
 

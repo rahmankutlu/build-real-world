@@ -147,11 +147,15 @@ tr:last-child td { border-bottom: 0; }
 code { padding: 2px 5px; border-radius: 3px; color: var(--accent); background: var(--accent-soft); font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; }
 .code-block { position: relative; margin: 12px 0 22px; padding: 18px; overflow-x: auto; color: var(--code-ink); background: var(--code); font: 12.5px/1.7 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre; }
 .copy-button { position: absolute; top: 8px; right: 8px; padding: 4px 8px; border: 1px solid #415049; border-radius: 4px; color: #bacac2; background: #223029; cursor: pointer; font: 11px ui-sans-serif, sans-serif; }
-.diagram-frame { margin: 14px 0 26px; }
+.diagram-frame { max-width: 100%; margin: 14px 0 26px; }
 .diagram-frame figcaption { display: flex; justify-content: space-between; padding: 8px 11px; border: 1px solid var(--line); border-bottom: 0; color: var(--muted); background: var(--surface-2); font-size: 11px; letter-spacing: .04em; }
 .diagram-expand, .dialog-bar button { padding: 0; border: 0; color: var(--accent); background: transparent; font-weight: 650; cursor: pointer; }
-.diagram { min-height: 170px; margin: 0; padding: 18px; overflow-x: auto; border: 1px solid var(--line); color: var(--ink); background: var(--surface); }
-.diagram svg { max-width: 100%; height: auto; }
+.diagram-expand:disabled { color: var(--muted); cursor: wait; opacity: .65; }
+.diagram { width: 100%; max-width: 100%; min-height: 170px; margin: 0; padding: 18px; overflow: auto; border: 1px solid var(--line); color: var(--ink); background: var(--surface); }
+.diagram svg { display: block; min-width: 640px; max-width: none; height: auto; margin-inline: auto; }
+.diagram-error, .diagram-loading { display: block; margin: 0; color: var(--muted); font-size: 13px; }
+.diagram-error { max-width: 100%; overflow-wrap: anywhere; }
+.mermaid-render-host { position: fixed; top: 0; left: -10000px; width: 1200px; visibility: hidden; pointer-events: none; contain: layout; }
 .diagram-dialog { width: min(1200px, calc(100vw - 32px)); max-width: none; padding: 0; border: 1px solid var(--line); color: var(--ink); background: var(--surface); box-shadow: 0 30px 90px rgb(0 0 0 / 30%); }
 .diagram-dialog::backdrop { background: rgb(5 10 8 / 72%); }
 .dialog-bar { display: flex; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid var(--line); }
